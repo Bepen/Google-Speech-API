@@ -35,7 +35,7 @@
   }
   .final {
     color: black;
-    padding-right: 3px; 
+    padding-right: 3px;
   }
   .interim {
     color: gray;
@@ -55,6 +55,10 @@
     min-height: 40px;
     text-align: left;
     vertical-align: top;
+  }
+  .bottom {
+    color: black;
+    font-size: 20px;
   }
   #headline {
     font-size: 40px;
@@ -78,6 +82,11 @@
     border: 0;
     background-color:transparent;
     padding: 0;
+  }
+  #wpm{
+    font-size: 20px;
+    text-align;center;
+    color: black;
   }
 </style>
 <h1 class="center" id="headline">
@@ -126,6 +135,9 @@
       (See chrome://settings/handlers to change.)
     </div>
   </div>
+  <div class="bottom">
+
+    <span id="wpmcount" class="bottom"></span>
   <p>
   <div id="div_language">
     <select id="select_language" onchange="updateCountry()"></select>
@@ -216,12 +228,17 @@ function updateCountry() {
   }
   select_dialect.style.visibility = list[1].length == 1 ? 'hidden' : 'visible';
 }
-
+var counter = 0;
 var create_email = false;
 var final_transcript = '';
 var recognizing = false;
 var ignore_onend;
 var start_timestamp;
+var wpmInterval;
+var wpmArr = new Array(5);
+var finalTranscriptCount = 0;
+var finalTranscriptPrev = 0;
+
 if (!('webkitSpeechRecognition' in window)) {
   upgrade();
 } else {
@@ -231,12 +248,15 @@ if (!('webkitSpeechRecognition' in window)) {
   recognition.interimResults = true;
 
   recognition.onstart = function() {
+    counter = 0;
     recognizing = true;
+    wpmInterval = setInterval(updateWPM, 1000);
     showInfo('info_speak_now');
     start_img.src = 'mic-animate.gif';
   };
 
   recognition.onerror = function(event) {
+    clearInterval(wpmInterval);
     if (event.error == 'no-speech') {
       start_img.src = 'mic.gif';
       showInfo('info_no_speech');
@@ -258,6 +278,7 @@ if (!('webkitSpeechRecognition' in window)) {
   };
 
   recognition.onend = function() {
+    clearInterval(wpmInterval);
     recognizing = false;
     if (ignore_onend) {
       return;
@@ -285,6 +306,7 @@ if (!('webkitSpeechRecognition' in window)) {
     for (var i = event.resultIndex; i < event.results.length; ++i) {
       if (event.results[i].isFinal) {
         final_transcript += event.results[i][0].transcript;
+        finalTranscriptCount = get_word_count(final_transcript);
       } else {
         interim_transcript += event.results[i][0].transcript;
       }
@@ -348,6 +370,7 @@ function emailButton() {
 }
 
 function startButton(event) {
+  count = 0;
   if (recognizing) {
     recognition.stop();
     return;
@@ -358,11 +381,37 @@ function startButton(event) {
   ignore_onend = false;
   final_span.innerHTML = '';
   interim_span.innerHTML = '';
+  wpmcount.innerHTML = "Words Per Minute: 0";
   start_img.src = 'mic-slash.gif';
   showInfo('info_allow');
   showButtons('none');
+  //var wpmInterval = setInterval(updateWPM, 1000);
   start_timestamp = event.timeStamp;
 }
+
+function updateWPM(){
+  wpmcount.innerHTML = "Words Per Minute: " + counter;
+  counter++;
+}
+
+function get_word_count(str) {
+  if (str.length == 0) {
+	return 0;
+  } else {
+	return str.match(/\S+/g).length;
+  }
+}
+
+function array_sum(arr) {
+  return arr.reduce(function(a, b) {
+	return a + b;
+  });
+}
+
+function updateArr(arr){
+
+}
+
 
 function showInfo(s) {
   if (s) {
