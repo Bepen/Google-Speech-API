@@ -228,7 +228,7 @@ function updateCountry() {
   }
   select_dialect.style.visibility = list[1].length == 1 ? 'hidden' : 'visible';
 }
-var counter = 1;
+var counter = 0;
 var create_email = false;
 var final_transcript = '';
 var recognizing = false;
@@ -236,8 +236,15 @@ var ignore_onend;
 var start_timestamp;
 var wpmInterval;
 var wpmArr = new Array(6);
+wpmArr[0] = 0;
+wpmArr[1] = 0;
+wpmArr[2] = 0;
+wpmArr[3] = 0;
+wpmArr[4] = 0;
+wpmArr[5] = 0;
 var finalTranscriptCount = 0;
 var finalTranscriptPrev = 0;
+var interimTranscriptCount = 0;
 
 if (!('webkitSpeechRecognition' in window)) {
   upgrade();
@@ -250,7 +257,7 @@ if (!('webkitSpeechRecognition' in window)) {
   recognition.onstart = function() {
     counter = 0;
     recognizing = true;
-    wpmInterval = setInterval(updateWPM, 1000);
+    wpmInterval = setInterval(updateWPM, 5000);
     showInfo('info_speak_now');
     start_img.src = 'mic-animate.gif';
   };
@@ -381,18 +388,17 @@ function startButton(event) {
   ignore_onend = false;
   final_span.innerHTML = '';
   interim_span.innerHTML = '';
-  wpmcount.innerHTML = "Words Per Minute: 0";
+  wpmcount.innerHTML = "Words Per Minute: -";
   start_img.src = 'mic-slash.gif';
   showInfo('info_allow');
   showButtons('none');
-  //var wpmInterval = setInterval(updateWPM, 1000);
   start_timestamp = event.timeStamp;
 }
 
 function updateWPM(){
-  updateArr();
-  var wordsPerMinute = array_sum(wpmArr);
-  wpmcount.innerHTML = "Words Per Minute: " + counter;
+  updateArr(wpmArr);
+  var wordsPerMin = array_sum(wpmArr)*2;
+  wpmcount.innerHTML = "Words Per Minute: " + wordsPerMin;
   counter++;
 }
 
@@ -412,7 +418,10 @@ function array_sum(arr) {
 
 function updateArr(arr){
   var dif = finalTranscriptCount - finalTranscriptPrev;
-  if(counter == 1){
+  finalTranscriptPrev = finalTranscriptCount;
+  if(counter == 0){
+    return;
+  } else if(counter == 1){
     wpmArr[0] = dif;
     wpmArr[1] = dif;
     wpmArr[2] = dif;
@@ -440,11 +449,11 @@ function updateArr(arr){
   } else if (counter == 6){
     wpmArr[5] = dif;
   } else{
-    var temp1 = wpmArr[1];
-    var temp2 = wpmArr[2];
-    var temp3 = wpmArr[3];
-    var temp4 = wpmArr[4];
-    var temp5 = wpmArr[5];
+    var i0 = wpmArr[1];
+    var i1 = wpmArr[2];
+    var i2 = wpmArr[3];
+    var i3 = wpmArr[4];
+    var i4 = wpmArr[5];
     wpmArr[0] = temp1;
     wpmArr[1] = temp2;
     wpmArr[2] = temp3;
@@ -452,8 +461,6 @@ function updateArr(arr){
     wpmArr[4] = temp5;
     wpmArr[5] = dif;
   }
-
-
   return;
 }
 
