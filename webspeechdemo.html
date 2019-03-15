@@ -245,6 +245,7 @@ wpmArr[5] = 0;
 var finalTranscriptCount = 0;
 var finalTranscriptPrev = 0;
 var interimTranscriptCount = 0;
+var counter2 = 0;
 
 if (!('webkitSpeechRecognition' in window)) {
   upgrade();
@@ -398,7 +399,13 @@ function startButton(event) {
 function updateWPM(){
   updateArr(wpmArr);
   var wordsPerMin = array_sum(wpmArr)*2;
-  wpmcount.innerHTML = "Words Per Minute: " + wordsPerMin;
+  if(wordsPerMin < 133){
+    wpmcount.innerHTML = "Words Per Minute: " + wordsPerMin + " (SPEAK FASTER)";
+  } else if(wordsPerMin > 188){
+    wpmcount.innerHTML = "Words Per Minute: " + wordsPerMin + " (SPEAK SLOWER)";
+  } else{
+    wpmcount.innerHTML = "Words Per Minute: " + wordsPerMin;
+  }
   counter++;
 }
 
@@ -417,7 +424,7 @@ function array_sum(arr) {
 }
 
 function updateArr(arr){
-  var dif = finalTranscriptCount - finalTranscriptPrev;
+  var dif = Math.abs(finalTranscriptCount - finalTranscriptPrev);
   finalTranscriptPrev = finalTranscriptCount;
   if(counter == 0){
     return;
