@@ -371,51 +371,32 @@ function startButton(event) {
 }
 
 function reset(){
+  final_transcript = '';
   displayBasedOnState();
 }
 
 function displayBasedOnState(){
-  headline.innerHTML = state;
   if(state == 0){
     info_speak_now.innerHTML = "Hello, would you like to access account information, technical support, or product information?";
   }
   if(state == 1){
     info_speak_now.innerHTML = "Would you like to check your balance or would you like to pay your balance in full?";
   }
-  if(state == 2){
-    info_speak_now.innerHTML = "Your balance is $50. Would you like to pay your balance?";
-  }
-  if(state == 3){
-    info_speak_now.innerHTML = "Okay cool";
-  }
   return;
 }
 
 function checkInput(){
   if(state == 0){
-    if(final_transcript.includes('Account') || final_transcript.includes(' account')){
+    if(final_transcript.includes('Account') || final_transcript.includes(" account")){
       state = 1;
+      reset();
+    } else{
+      reset();
     }
   }
   if(state == 1){
-    info_speak_now.innerHTML = "jkahshashdjahjskdjajkshd"
-    if(final_transcript.includes('Check') || final_transcript.includes(' check')){
-      state == 2;
-    } else if(final_transcript.includes('Pay') || final_transcript.includes(' pay')){
-      state == 3;
-    } else{
-    }
-  }
-  else if(state == 2){
-    if(final_transcript.includes('Yes') || final_transcript.includes(' yes')){
-      state == 3;
-    } else if(final_transcript.includes('No') || final_transcript.includes(' no')){
-      //end
-    }
-  }
 
-
-  reset();
+  }
   return;
 }
 
