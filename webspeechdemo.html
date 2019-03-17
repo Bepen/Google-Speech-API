@@ -244,8 +244,7 @@ wpmArr[4] = 0;
 wpmArr[5] = 0;
 var finalTranscriptCount = 0;
 var finalTranscriptPrev = 0;
-var interimTranscriptCount = 0;
-var counter2 = 0;
+var ended = false;
 
 if (!('webkitSpeechRecognition' in window)) {
   upgrade();
@@ -315,6 +314,7 @@ if (!('webkitSpeechRecognition' in window)) {
       if (event.results[i].isFinal) {
         final_transcript += event.results[i][0].transcript;
         finalTranscriptCount = get_word_count(final_transcript);
+        ended = true;
       } else {
         interim_transcript += event.results[i][0].transcript;
       }
@@ -325,6 +325,11 @@ if (!('webkitSpeechRecognition' in window)) {
     if (final_transcript || interim_transcript) {
       showButtons('inline-block');
     }
+    if(!ended){
+      finalTranscriptCount = get_word_count(final_transcript) + get_word_count(interim_transcript);
+    }
+    ended = false;
+
   };
 }
 
@@ -379,6 +384,10 @@ function emailButton() {
 
 function startButton(event) {
   count = 0;
+  finalTranscriptPrev = 0;
+  finalTranscriptCount = 0;
+  dif = 0;
+  ended = false;
   if (recognizing) {
     recognition.stop();
     return;
@@ -424,9 +433,10 @@ function array_sum(arr) {
 }
 
 function updateArr(arr){
-  var dif = Math.abs(finalTranscriptCount - finalTranscriptPrev);
+  var dif = finalTranscriptCount - finalTranscriptPrev;
   finalTranscriptPrev = finalTranscriptCount;
   if(counter == 0){
+    finalTranscriptPrev = 0;
     return;
   } else if(counter == 1){
     wpmArr[0] = dif;
